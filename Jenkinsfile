@@ -1,39 +1,35 @@
 pipeline {
-    agent any
-    
+    agent {
+        docker {
+            image 'node:22-alpine'
+            args '-v $WORKSPACE:/workspace -w /workspace'
+        }
+    }
+
     options {
         ansiColor('xterm')
     }
- 
+
     stages {
         stage('build') {
             steps {
-                script {
-                    docker.image('node:22-alpine').inside {
-                        sh 'npm ci'
-                        sh 'npm run build'
-                    }
-                }
+                sh 'npm ci'
+                sh 'npm run build'
             }
         }
- 
-        stage('test') {
+
+        stage('unit tests') {
             steps {
-                script {
-                    docker.image('node:22-alpine').inside {
-                        sh 'npx vitest run --reporter=verbose'
-                    }
-                }
+                sh 'npx vitest run --reporter=verbose'
             }
         }
- 
+
         stage('deploy') {
+            agent {
+                docker { image 'alpine' }
+            }
             steps {
-                script {
-                    docker.image('alpine').inside {
-                        echo 'Mock deployment was successful!'
-                    }
-                }
+                echo 'Mock deployment was successful!'
             }
         }
     }
