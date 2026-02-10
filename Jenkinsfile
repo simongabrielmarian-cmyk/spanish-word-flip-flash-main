@@ -22,22 +22,14 @@ pipeline {
         }
 
         stage('test') {
-            parallel {
-                stage('unit tests') {
-                    agent {
-                        docker {
-                            image 'node:22-alpine'
-                            reuseNode true
-                        }
-                    }
-                    steps {
-                        // Unit tests with Vitest
+            steps {
+                script {
+                    docker.image('node:22-alpine').inside {
                         sh 'npx vitest run --reporter=verbose'
-                        sh 'npm ci'
                     }
                 }
             }
-        }
+        }   
 
         stage('deploy') {
             agent {
