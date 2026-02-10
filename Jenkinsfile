@@ -30,6 +30,7 @@ pipeline {
                 sh 'rm -rf node_modules package-lock.json'
                 sh 'npm install'
                 sh 'npm run test:unit'
+                sh 'npx vitest run --reporter=verbose'
             }
         }
 
