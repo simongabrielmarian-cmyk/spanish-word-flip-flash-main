@@ -1,4 +1,5 @@
-//pipeline for a Node.js project with build, test, and deploy stages using Docker agents    
+//pipeline for a Node.js project with build, test, and deploy stages using Docker agents
+// for testing purpose    
 
 pipeline {
     agent any
