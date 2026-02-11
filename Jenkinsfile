@@ -19,19 +19,31 @@ pipeline {
         }
 
         stage('test') {
-            agent {
-                docker {
-                    image 'node:22-alpine'
+            parallel {
+                stage('Unit Tests') { 
+                    agent {
+                        docker {
+                             image 'node:22-alpine'
+                        }       
+                    }
+                    steps {
+                        sh 'npm ci'
+                        sh 'npm run test:unit'
+                    }
+                }
+                stage('Integration Tests') {
+                    agent {
+                        docker {
+                            image 'mcr.microsoft.com/playwright:v1.54.2-jammy'
+                        }
+                    }
+                    steps {
+                        sh 'npm ci'
+                        sh 'npm run test:e2e'
+                    }
                 }
             }
-            steps {
-                // Unit tests with Vitest
-                sh 'npm cache clean --force'
-                sh 'rm -rf node_modules package-lock.json'
-                sh 'npm install'
-                sh 'npm run test:unit'
-                sh 'npx vitest run --reporter=verbose'
-            }
+
         }
 
         stage('deploy') {
