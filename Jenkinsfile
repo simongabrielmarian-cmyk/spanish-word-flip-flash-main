@@ -63,6 +63,7 @@ pipeline {
             agent {
                 docker {
                     image 'mcr.microsoft.com/playwright:v1.54.2-jammy'
+                    args '-v /var/run/docker.sock:/var/run/docker.sock'
                     //reuseNode true
                 }
             }
