@@ -24,11 +24,15 @@ pipeline {
                     agent {
                         docker {
                              image 'node:22-alpine'
+                             //reuseNodeModules true
                         }       
-                    }
+            }
                     steps {
-                        sh 'npm ci'
+                        sh 'npm cache clean --force'
+                        sh 'rm -rf node_modules package-lock.json'
+                        sh 'npm install'
                         sh 'npm run test:unit'
+                        sh 'npx vitest run --reporter=verbose'
                     }
                 }
                 stage('Integration Tests') {
@@ -39,7 +43,7 @@ pipeline {
                     }
                     steps {
                         sh 'npm ci'
-                        sh 'npm run test:e2e'
+                        sh 'npx playwright test'
                     }
                 }
             }
