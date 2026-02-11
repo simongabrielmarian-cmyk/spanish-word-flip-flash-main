@@ -70,7 +70,7 @@ pipeline {
                 E2E_BASE_URL = 'https://spanish-cards.netlify.app/'
             }
             steps {
-                sh 'echo "Running end-to-end tests against $E2E_BASE_URL"'
+                sh 'echo "Running end-to-end tests againsttt $E2E_BASE_URL"'
                 sh 'npx playwright test'
             }
         }
