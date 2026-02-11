@@ -10,6 +10,7 @@ pipeline {
             agent {
                 docker {
                     image 'node:22-alpine'
+                    reuseNode true
                 }
             }
             steps {
@@ -19,18 +20,30 @@ pipeline {
         }
 
         stage('test') {
-            agent {
-                docker {
-                    image 'node:22-alpine'
+            parallel {
+                stage('unit tests') {
+                    agent {
+                        docker {
+                            image 'node:22-alpine'
+                            reuseNode true
+                        }
+                    }
+                    steps {
+                        // Unit tests with Vitest
+                        sh 'npx vitest run --reporter=verbose'
+                    }
                 }
-            }
-            steps {
-                // Unit tests with Vitest
-                sh 'npm cache clean --force'
-                sh 'rm -rf node_modules package-lock.json'
-                sh 'npm install'
-                sh 'npm run test:unit'
-                sh 'npx vitest run --reporter=verbose'
+                stage('integration tests') {
+                    agent {
+                        docker {
+                            image 'mcr.microsoft.com/playwright:v1.54.2-jammy'
+                            reuseNode true
+                        }
+                    }
+                    steps {
+                        sh 'npx playwright test'
+                    }
+                }
             }
         }
 
@@ -43,6 +56,21 @@ pipeline {
             steps {
                 // Mock deployment which does nothing
                 echo 'Mock deployment was successful!'
+            }
+        }
+
+        stage('e2e') {
+            agent {
+                docker {
+                    image 'mcr.microsoft.com/playwright:v1.54.2-jammy'
+                    reuseNode true
+                }
+            }
+            environment {
+                E2E_BASE_URL = 'https://spanish-cards.netlify.app/'
+            }
+            steps {
+                sh 'npx playwright test'
             }
         }
     }
